@@ -1,3 +1,0 @@
-/home/morgana/projects/mandelbrot/build/CMakeFiles/rebuild_cache.dir
-/home/morgana/projects/mandelbrot/build/CMakeFiles/edit_cache.dir
-/home/morgana/projects/mandelbrot/build/CMakeFiles/mandelbrot.dir

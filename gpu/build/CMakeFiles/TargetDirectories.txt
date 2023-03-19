@@ -1,3 +1,0 @@
-/home/morgana/programs/projects/mandelbrot/gpu/build/CMakeFiles/edit_cache.dir
-/home/morgana/programs/projects/mandelbrot/gpu/build/CMakeFiles/rebuild_cache.dir
-/home/morgana/programs/projects/mandelbrot/gpu/build/CMakeFiles/mandelbrot_gpu.dir
