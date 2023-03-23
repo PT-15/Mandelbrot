@@ -9,6 +9,11 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
+//Paint it pink: 255 20 147
+#define R 255
+#define G 20
+#define B 147
+
 struct mandelConfig {
     float offsetX; //width/2
     float offsetY; //height/2
@@ -36,7 +41,14 @@ __device__ int mandelbrot (int x, int y, const mandelConfig& pConf)
     const float maxZ = 1 + sqrt(2.);
 
     complexNum z(0,0);
-    complexNum c( (x - pConf.offsetX)/pConf.scale, (y - pConf.offsetY)/pConf.scale );
+
+    float fx = (float)x * pConf.scale + pConf.offsetX - (pConf.scale * (float)WIDTH/2.);
+    float fy = (float)y * pConf.scale + pConf.offsetY - (pConf.scale * (float)HEIGHT/2.);
+
+    //float fx = ((x - (float)WIDTH/2) - pConf.offsetX)/pConf.scale;
+    //float fy = ((y - (float)HEIGHT/2) - pConf.offsetY)/pConf.scale;
+
+    complexNum c(fx, fy);
 
     for (int i = 0; i < pConf.maxIt; i++){
         z = z*z + c;
@@ -53,9 +65,9 @@ __global__ void kernel (const mandelConfig pConf, int* grid, uint8_t rShift, uin
 
     int i = mandelbrot(x, y, pConf);
 
-    int r = (255*i)/pConf.maxIt;
-    int g = (20*i)/pConf.maxIt;
-    int b = (147*i)/pConf.maxIt;
+    int r = (R*i)/pConf.maxIt;
+    int g = (G*i)/pConf.maxIt;
+    int b = (B*i)/pConf.maxIt;
     int offset = x + y*gridDim.x;
 
     grid[offset] = (r << rShift) + (g << gShift) + (b << bShift);
@@ -74,8 +86,8 @@ int main ( void )
     //Create SDL surface
     int x = 0;
     int y = 0;
-    int width = WIDTH;
-    int height = HEIGHT;
+    int width = (int)WIDTH;
+    int height = (int)HEIGHT;
 
     SDL_Window* win = SDL_CreateWindow("ULTIMATE MANDELBROT MASSIVE PARALLEL PROCESSING!!!", x, y, width, height, 0);
     SDL_Surface* surf = SDL_GetWindowSurface(win);
@@ -83,9 +95,9 @@ int main ( void )
 
     //Create first call configuration
     mandelConfig pConf;
-    pConf.offsetX = width/2;
-    pConf.offsetY = height/2;
-    pConf.scale = 10;
+    pConf.offsetX = 0.;
+    pConf.offsetY = 0.;
+    pConf.scale = 0.02;
     pConf.maxIt = 50;
 
     //Allocate space in device for the pixel grid
@@ -118,31 +130,33 @@ int main ( void )
                         case SDLK_ESCAPE:
                             done = true;
                             break;
+#define OFFSET_STEP 100.
                         case SDLK_RIGHT:
-                            pConf.offsetX += 20.;
+                            pConf.offsetX += OFFSET_STEP*pConf.scale;
                             break;
                         case SDLK_LEFT:
-                            pConf.offsetX -= 20.;
+                            pConf.offsetX -= OFFSET_STEP*pConf.scale;
                             break;
                         case SDLK_UP:
-                            pConf.offsetY -= 20.;
+                            pConf.offsetY -= OFFSET_STEP*pConf.scale;
                             break;
                         case SDLK_DOWN:
-                            pConf.offsetY += 20.;
+                            pConf.offsetY += OFFSET_STEP*pConf.scale;
                             break;
                         case SDLK_PLUS:
-                            pConf.scale *= 1.1;
+                            pConf.scale /= 1.1;
                             break;
                         case SDLK_MINUS:
-                            if (pConf.scale -10. > 0.)
-                                pConf.scale /= 1.1;
+                            if (pConf.scale + 10. > 0.)
+                                pConf.scale *= 1.1;
                             break;
                         case SDLK_l:
                             if (pConf.maxIt - 10 > 0.)
                                 pConf.maxIt -= 10;
                             break;
                         case SDLK_m:
-                            pConf.maxIt += 10;
+                            if (pConf.maxIt <= 300)
+                                pConf.maxIt += 10;
                             break;
                     }
 
