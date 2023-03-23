@@ -9,10 +9,13 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
-//Paint it pink: 255 20 147
-#define R 255
-#define G 20
-#define B 147
+//Fucsia: 255 20 147
+//Light blue: 100, 136, 159
+//Purple: 128, 0, 128
+//Electric purple: 191, 0, 255
+#define R 191
+#define G 0
+#define B 255
 
 struct mandelConfig {
     float offsetX; //width/2
